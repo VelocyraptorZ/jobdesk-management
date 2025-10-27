@@ -147,7 +147,7 @@
 
         <!-- Footer -->
         <footer class="py-6 text-center text-blue-200 text-sm">
-            <p>© {{ date('Y') }} Mechanical Engineering School Jobdesk Management System - Created by Nico Prasetyo</p>
+            <p>Copyright © {{ date('Y') }} - Created by Nico Prasetyo</p>
         </footer>
     </div>
 </body>

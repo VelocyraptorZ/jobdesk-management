@@ -32,6 +32,9 @@
                                 Approvals
                             </x-nav-link>
                         @elseif(auth()->user()->isAdmin())
+                            <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                                Monitoring Dashboard
+                            </x-nav-link>
                             <x-nav-link :href="route('jobdesks.entries.index')" :active="request()->routeIs('jobdesks.entries.index')">
                                 Jobdesk Entries
                             </x-nav-link>

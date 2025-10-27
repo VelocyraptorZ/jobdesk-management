@@ -63,7 +63,7 @@ Route::middleware('auth')->group(function () {
     });
 
     // Director: Dashboard
-    Route::middleware(['role:user,superadmin'])->group(function () {
+    Route::middleware(['role:user,admin,superadmin'])->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
         Route::get('/dashboard/export', [DashboardController::class, 'export'])->name('dashboard.export');
     });
