@@ -25,13 +25,13 @@ class MasterDataSeeder extends Seeder
         User::factory()->create(['email' => 'director@example.com', 'role' => 'user']);
 
         // Master data
-        Instructor::factory(12)->create();
-        Course::factory(15)->create();
-        Production::factory(6)->create();
-        Training::factory(6)->create();
+        // Instructor::factory(12)->create();
+        // Course::factory(15)->create();
+        // Production::factory(6)->create();
+        // Training::factory(6)->create();
 
         // Jobdesks (will auto-create instructors if needed, but we already have them)
         // To link to existing instructors only:
-        Jobdesk::factory(80)->create();
+        // Jobdesk::factory(80)->create();
     }
 }
