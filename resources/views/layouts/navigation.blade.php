@@ -28,6 +28,9 @@
                             <x-nav-link :href="route('master.trainings.index')" :active="request()->routeIs('master.trainings.index')">
                                 Training Services
                             </x-nav-link>
+                            <x-nav-link :href="route('master.internal-activities.index')" :active="request()->routeIs('master.internal-activities.*')">
+                                Internal Activities
+                            </x-nav-link>
                             <x-nav-link :href="route('master.approvals.index')" :active="request()->routeIs('master.approvals.*')">
                                 Approvals
                             </x-nav-link>

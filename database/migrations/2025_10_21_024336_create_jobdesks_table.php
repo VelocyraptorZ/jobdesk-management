@@ -17,10 +17,11 @@ return new class extends Migration
             $table->foreignId('course_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('production_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('training_id')->nullable()->constrained()->nullOnDelete();
+            $table->foreignId('internal_activity_id')->nullable()->constrained()->nullOnDelete();
             $table->date('activity_date');
             $table->time('start_time');
             $table->time('end_time')->nullable();
-            $table->enum('activity_type', ['practical', 'theoretical', 'production', 'training']);
+            $table->enum('activity_type', ['practical', 'theoretical', 'production', 'training', 'internal']);
             $table->text('description');
             $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
             $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();

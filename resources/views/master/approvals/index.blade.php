@@ -58,6 +58,8 @@
                                                         🏭 {{ $entry->production->name }}
                                                     @elseif($entry->training)
                                                         📚 {{ $entry->training->name }}
+                                                    @elseif($entry->internalActivity)
+                                                        🏢 {{ $entry->internalActivity->name }}
                                                     @else
                                                         {{ ucfirst($entry->activity_type) }}
                                                     @endif

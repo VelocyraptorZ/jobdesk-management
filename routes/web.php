@@ -7,6 +7,7 @@ use App\Http\Controllers\{
     CourseController,
     ProductionController,
     TrainingController,
+    InternalActivityController,
     JobdeskController,
     ApprovalController
 };
@@ -52,6 +53,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('courses', CourseController::class);
         Route::resource('productions', ProductionController::class);
         Route::resource('trainings', TrainingController::class);
+        Route::resource('internal-activities', InternalActivityController::class);
         Route::get('approvals', [ApprovalController::class, 'index'])->name('approvals.index');
         Route::patch('approvals/{jobdesk}/approve', [ApprovalController::class, 'approve'])->name('approvals.approve');
         Route::patch('approvals/{jobdesk}/reject', [ApprovalController::class, 'reject'])->name('approvals.reject');

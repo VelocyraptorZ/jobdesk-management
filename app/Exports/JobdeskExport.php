@@ -24,6 +24,7 @@ class JobdeskExport implements FromCollection, WithHeadings
                 'Type' => ucfirst($j->activity_type),
                 'Activity' => $j->course ? $j->course->name : ($j->production ? $j->production->name : ($j->training ? $j->training->name : 'N/A')),
                 'Description' => $j->description,
+                'Status' => $j->status,
                 'Start Time' => $j->start_time,
             ];
         });
@@ -31,6 +32,6 @@ class JobdeskExport implements FromCollection, WithHeadings
 
     public function headings(): array
     {
-        return ['Date', 'Instructor', 'Type', 'Activity', 'Description', 'Start Time'];
+        return ['Date', 'Instructor', 'Type', 'Activity', 'Description', 'Status', 'Start Time'];
     }
 }

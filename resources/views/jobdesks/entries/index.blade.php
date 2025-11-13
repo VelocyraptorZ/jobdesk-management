@@ -39,6 +39,7 @@
                             <option value="theoretical" {{ request('activity_type') == 'theoretical' ? 'selected' : '' }}>Theoretical</option>
                             <option value="production" {{ request('activity_type') == 'production' ? 'selected' : '' }}>Production</option>
                             <option value="training" {{ request('activity_type') == 'training' ? 'selected' : '' }}>Training</option>
+                            <option value="internal" {{ request('activity_type') == 'internal' ? 'selected' : '' }}>Internal Activity</option>
                         </select>
                     </div>
 
@@ -108,6 +109,8 @@
                                             🏭 {{ $j->production->name }}
                                         @elseif($j->training)
                                             📚 {{ $j->training->name }}
+                                        @elseif($j->internalActivity)
+                                            ⚙️ {{ $j->internalActivity->name }}
                                         @else
                                             <em>{{ ucfirst($j->activity_type) }}</em>
                                         @endif

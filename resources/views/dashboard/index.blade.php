@@ -37,6 +37,7 @@
                             <option value="theoretical" {{ request('activity_type') == 'theoretical' ? 'selected' : '' }}>Theoretical</option>
                             <option value="production" {{ request('activity_type') == 'production' ? 'selected' : '' }}>Production</option>
                             <option value="training" {{ request('activity_type') == 'training' ? 'selected' : '' }}>Training</option>
+                            <option value="internal" {{ request('activity_type') == 'internal' ? 'selected' : '' }}>Internal Activity</option>
                         </select>
                     </div>
                     <div class="flex flex-col space-y-2">
@@ -109,6 +110,8 @@
                                                     🏭 {{ $jobdesk->production->name }}
                                                 @elseif($jobdesk->training)
                                                     📚 {{ $jobdesk->training->name }}
+                                                @elseif($jobdesk->internalActivity)
+                                                    ⚙️ {{ $jobdesk->internalActivity->name }}
                                                 @else
                                                     <em>N/A</em>
                                                 @endif
@@ -164,7 +167,7 @@
                     data: {!! json_encode($chartData, JSON_NUMERIC_CHECK) !!}
                 }],
                 xaxis: {
-                    categories: ['Practical', 'Theoretical', 'Production', 'Training'],
+                    categories: ['Practical', 'Theoretical', 'Production', 'Training', 'Internal'],
                     title: { text: 'Activity Type' }
                 },
                 yaxis: {
@@ -175,7 +178,7 @@
                 fill: {
                     opacity: 1
                 },
-                colors: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444'],
+                colors: ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'],
                 tooltip: {
                     y: { formatter: function (val) { return val + " activities" } }
                 }

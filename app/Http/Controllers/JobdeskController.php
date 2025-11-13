@@ -8,6 +8,7 @@ use App\Models\Instructor;
 use App\Models\Course;
 use App\Models\Production;
 use App\Models\Training;
+use App\Models\InternalActivity;
 use Illuminate\Validation\Rule;
 
 class JobdeskController extends Controller
@@ -48,6 +49,7 @@ class JobdeskController extends Controller
             'courses' => Course::all(),
             'productions' => Production::all(),
             'trainings' => Training::all(),
+            'internalActivities' => InternalActivity::all(),
         ]);
     }
 
@@ -61,7 +63,7 @@ class JobdeskController extends Controller
             'instructor_id' => 'required|exists:instructors,id',
             'activity_date' => 'required|date',
             'start_time' => 'required',
-            'activity_type' => ['required', Rule::in(['practical', 'theoretical', 'production', 'training'])],
+            'activity_type' => ['required', Rule::in(['practical', 'theoretical', 'production', 'training', 'internal'])],
             'description' => 'required|string',
         ]);
 
@@ -78,6 +80,10 @@ class JobdeskController extends Controller
             $request->validate(['training_id' => 'nullable|exists:trainings,id']);
         }
 
+        if ($request->activity_type === 'internal') {
+            $request->validate(['internal_activity_id' => 'required|exists:internal_activities,id']);
+        }
+
         $data = $request->only([
             'instructor_id', 'activity_date', 'start_time', 'activity_type', 'description'
         ]);
@@ -86,6 +92,7 @@ class JobdeskController extends Controller
         $data['course_id'] = null;
         $data['production_id'] = null;
         $data['training_id'] = null;
+        $data['internal_activity_id'] = null; 
 
         // Set the correct one
         if (in_array($request->activity_type, ['practical', 'theoretical'])) {
@@ -94,6 +101,8 @@ class JobdeskController extends Controller
             $data['production_id'] = $request->production_id;
         } elseif ($request->activity_type === 'training') {
             $data['training_id'] = $request->training_id;
+        } elseif ($request->activity_type === 'internal') {
+            $data['internal_activity_id'] = $request->internal_activity_id;
         }
 
         $data['status'] = 'pending';
@@ -122,6 +131,7 @@ class JobdeskController extends Controller
             'courses' => Course::all(),
             'productions' => Production::all(),
             'trainings' => Training::all(),
+            'internalActivities' => InternalActivity::all(),
         ]);
     }
 
@@ -135,7 +145,7 @@ class JobdeskController extends Controller
             'instructor_id' => 'required|exists:instructors,id',
             'activity_date' => 'required|date',
             'start_time' => 'required',
-            'activity_type' => ['required', Rule::in(['practical', 'theoretical', 'production', 'training'])],
+            'activity_type' => ['required', Rule::in(['practical', 'theoretical', 'production', 'training', 'internal'])],
             'description' => 'required|string',
         ]);
 
@@ -152,6 +162,10 @@ class JobdeskController extends Controller
             $request->validate(['training_id' => 'nullable|exists:trainings,id']);
         }
 
+        if ($request->activity_type === 'internal') {
+            $request->validate(['internal_activity_id' => 'required|exists:internal_activities,id']);
+        }
+
         $data = $request->only([
             'instructor_id', 'activity_date', 'start_time', 'activity_type', 'description'
         ]);
@@ -160,6 +174,7 @@ class JobdeskController extends Controller
         $data['course_id'] = null;
         $data['production_id'] = null;
         $data['training_id'] = null;
+        $data['internal_activity_id'] = null; 
 
         // Set the correct reference
         if (in_array($request->activity_type, ['practical', 'theoretical'])) {
@@ -168,6 +183,8 @@ class JobdeskController extends Controller
             $data['production_id'] = $request->production_id;
         } elseif ($request->activity_type === 'training') {
             $data['training_id'] = $request->training_id;
+        } elseif ($request->activity_type === 'internal') {
+            $data['internal_activity_id'] = $request->internal_activity_id;
         }
 
         $entry->update($data);

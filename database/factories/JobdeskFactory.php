@@ -8,6 +8,8 @@ use App\Models\Jobdesk;
 use App\Models\Course;
 use App\Models\Production;
 use App\Models\Training;
+use App\Models\InternalActivity;
+
 
 
 /**
@@ -23,12 +25,13 @@ class JobdeskFactory extends Factory
      */
     public function definition(): array
     {
-        $type = $this->faker->randomElement(['practical', 'theoretical', 'production', 'training']);
+        $type = $this->faker->randomElement(['practical', 'theoretical', 'production', 'training', 'internal']);
         $descriptions = [
             'practical' => 'Conducted lab session on mechanical assembly.',
             'theoretical' => 'Delivered lecture on thermodynamic cycles.',
             'production' => 'Supervised student prototype fabrication.',
-            'training' => 'Facilitated CNC safety and operation training.'
+            'training' => 'Facilitated CNC safety and operation training.',
+            'internal' => 'Organized internal workshop on team collaboration.'
         ];
 
         if (Instructor::count() === 0) {
@@ -44,6 +47,7 @@ class JobdeskFactory extends Factory
             'course_id' => in_array($type, ['practical', 'theoretical']) ? Course::factory() : null,
             'production_id' => $type === 'production' ? Production::factory() : null,
             'training_id' => $type === 'training' ? Training::factory() : null,
+            'internal_activity_id' => $type === 'internal' ? \App\Models\InternalActivity::factory() : null,
         ];
     }
 }

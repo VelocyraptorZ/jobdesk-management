@@ -20,6 +20,7 @@
                 <th>Type</th>
                 <th>Activity</th>
                 <th>Description</th>
+                <th>Status</th>
             </tr>
         </thead>
         <tbody>
@@ -40,6 +41,7 @@
                     @endif
                 </td>
                 <td>{{ $j->description }}</td>
+                <td>{{ $j->status }}</td>
             </tr>
             @endforeach
         </tbody>

@@ -19,6 +19,7 @@ class Jobdesk extends Model
         'course_id',
         'production_id',
         'training_id',
+        'internal_activity_id',
         'status',
         'updated_by' // ← added
     ];
@@ -41,6 +42,11 @@ class Jobdesk extends Model
     public function training()
     {
         return $this->belongsTo(Training::class);
+    }
+
+    public function internalActivity()
+    {
+        return $this->belongsTo(InternalActivity::class);
     }
 
     public function updater()

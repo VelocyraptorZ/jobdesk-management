@@ -39,6 +39,7 @@
                     <option value="theoretical" {{ old('activity_type') == 'theoretical' ? 'selected' : '' }}>Theoretical Session</option>
                     <option value="production" {{ old('activity_type') == 'production' ? 'selected' : '' }}>Production Activity</option>
                     <option value="training" {{ old('activity_type') == 'training' ? 'selected' : '' }}>Training Service</option>
+                    <option value="internal" {{ old('activity_type', $entry->activity_type ?? '') == 'internal' ? 'selected' : '' }}>Internal Activity</option>
                 </select>
             </div>
 
@@ -78,6 +79,18 @@
                 </select>
             </div>
 
+            <div id="internalField" class="mb-4" style="display: none;">
+                <label class="block text-gray-700">Internal Activity</label>
+                <select name="internal_activity_id" class="w-full border rounded p-2">
+                    <option value="">-- Select Internal Activity --</option>
+                    @foreach($internalActivities as $ia)
+                        <option value="{{ $ia->id }}" {{ old('internal_activity_id', $entry->internal_activity_id ?? '') == $ia->id ? 'selected' : '' }}>
+                            {{ $ia->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+
             <div class="mb-4">
                 <label class="block text-gray-700">Description</label>
                 <textarea name="description" rows="4" class="w-full border rounded p-2" required>{{ old('description') }}</textarea>
@@ -90,12 +103,14 @@
         </form>
     </div>
 
+    
     <script>
         document.getElementById('activityType').addEventListener('change', function () {
             const type = this.value;
             document.getElementById('courseField').style.display = (type === 'practical' || type === 'theoretical') ? 'block' : 'none';
             document.getElementById('productionField').style.display = (type === 'production') ? 'block' : 'none';
             document.getElementById('trainingField').style.display = (type === 'training') ? 'block' : 'none';
+            document.getElementById('internalField').style.display = (type === 'internal') ? 'block' : 'none'; // ← add this
         });
     </script>
 </x-app-layout>

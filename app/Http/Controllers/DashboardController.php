@@ -31,8 +31,9 @@ class DashboardController extends Controller
         $theoretical = $query->clone()->where('activity_type', 'theoretical')->count();
         $production = $query->clone()->where('activity_type', 'production')->count();
         $training = $query->clone()->where('activity_type', 'training')->count();
+        $internal = $query->clone()->where('activity_type', 'internal')->count();
 
-        $chartData = [(int)$practical, (int)$theoretical, (int)$production, (int)$training];
+        $chartData = [(int)$practical, (int)$theoretical, (int)$production, (int)$training, (int)$internal];
 
         return view('dashboard.index', [
             'jobdesks' => $jobdesks,
