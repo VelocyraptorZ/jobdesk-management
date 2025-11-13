@@ -43,24 +43,59 @@ class DashboardController extends Controller
     }
 
     public function export(Request $request) {
-        $jobdesks = Jobdesk::with('instructor')
-            ->when($request->filled('start') && $request->filled('end'), fn($q) =>
-                $q->whereBetween('activity_date', [$request->start, $request->end])
-            )
-            ->when($request->filled('instructor_id'), fn($q) =>
-                $q->where('instructor_id', $request->instructor_id)
-            )
-            ->get();
+        // ✅ Reuse the SAME query logic as index()
+        $query = Jobdesk::with('instructor', 'course', 'production', 'training', 'internalActivity', 'updater')
+            ->approved(); // Director only sees approved
+
+        // Apply identical filters
+        if ($request->filled('start') && $request->filled('end')) {
+            $query->whereBetween('activity_date', [$request->start, $request->end]);
+        }
+        if ($request->filled('instructor_id')) {
+            $query->where('instructor_id', $request->instructor_id);
+        }
+        if ($request->filled('activity_type')) {
+            $query->where('activity_type', $request->activity_type);
+        }
+
+        $jobdesks = $query->orderBy('activity_date', 'desc')->get();
+
+        // Get filter labels for metadata
+        $filters = [];
+        if ($request->filled('start') && $request->filled('end')) {
+            $filters[] = 'Date: ' . $request->start . ' to ' . $request->end;
+        }
+        if ($request->filled('instructor_id')) {
+            $instructor = Instructor::find($request->instructor_id);
+            $filters[] = 'Instructor: ' . ($instructor ? $instructor->name : 'Unknown');
+        }
+        if ($request->filled('activity_type')) {
+            $typeMap = [
+                'practical' => 'Practical',
+                'theoretical' => 'Theoretical',
+                'production' => 'Production',
+                'training' => 'Training',
+                'internal' => 'Internal Activity'
+            ];
+            $filters[] = 'Activity: ' . ($typeMap[$request->activity_type] ?? $request->activity_type);
+        }
 
         if ($request->format === 'excel') {
-            return Excel::download(new \App\Exports\JobdeskExport($jobdesks), 'jobdesks.xlsx');
+            return Excel::download(
+                new \App\Exports\JobdeskExport($jobdesks, $filters),
+                'jobdesk_report_' . now()->format('Y-m-d_H-i') . '.xlsx'
+            );
         }
 
         if ($request->format === 'pdf') {
-            $pdf = Pdf::loadView('exports.jobdesks-pdf', compact('jobdesks'));
-            return $pdf->download('jobdesks.pdf');
+            $pdf = Pdf::loadView('exports.jobdesks-pdf', [
+                'jobdesks' => $jobdesks,
+                'filters' => $filters,
+                'exportedAt' => now()->format('d M Y H:i')
+            ]);
+            return $pdf->download('jobdesk_report_' . now()->format('Y-m-d_H-i') . '.pdf');
         }
 
-        return back()->withErrors('Invalid export format.');
+        abort(400, 'Invalid export format');
     }
 }
