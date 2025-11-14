@@ -41,13 +41,15 @@ class JobdeskFactory extends Factory
         return [
             'instructor_id' => Instructor::inRandomOrder()->first()->id,
             'activity_date' => now()->subDays(rand(0, 30)),
-            'start_time' => '08:00:00',
+            'start_time' => '07:30:00',
+            'end_time' => '16:30:00',
             'activity_type' => $type,
             'description' => $this->faker->sentence,
             'course_id' => in_array($type, ['practical', 'theoretical']) ? Course::factory() : null,
             'production_id' => $type === 'production' ? Production::factory() : null,
             'training_id' => $type === 'training' ? Training::factory() : null,
             'internal_activity_id' => $type === 'internal' ? \App\Models\InternalActivity::factory() : null,
+            'status' => $this->faker->randomElement(['pending', 'approved', 'rejected']),
         ];
     }
 }
