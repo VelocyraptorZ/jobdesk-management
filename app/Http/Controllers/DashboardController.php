@@ -10,8 +10,17 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class DashboardController extends Controller
 {
-    public function index(Request $request) {
-        $query = Jobdesk::with('instructor', 'course', 'production', 'training');
+    public function index(Request $request)
+    {
+        $query = Jobdesk::with([
+            'instructor',
+            'course',           // ✅ for practical/theoretical
+            'production',       // ✅ for production
+            'training',         // ✅ for training
+            'internalActivity', // ✅ for internal
+            'updater'
+        ])
+        ->approved(); // Director only sees approved
 
         // Apply filters
         if ($request->filled('start') && $request->filled('end')) {
@@ -24,16 +33,15 @@ class DashboardController extends Controller
             $query->where('activity_type', $request->activity_type);
         }
 
-        $jobdesks = $query->approved()->orderBy('activity_date', 'desc')->paginate(20);
+        $jobdesks = $query->orderBy('activity_date', 'desc')->paginate(20);
 
-        // ✅ Build chart data: always 4 values in fixed order
-        $practical = $query->clone()->where('activity_type', 'practical')->count();
-        $theoretical = $query->clone()->where('activity_type', 'theoretical')->count();
-        $production = $query->clone()->where('activity_type', 'production')->count();
-        $training = $query->clone()->where('activity_type', 'training')->count();
-        $internal = $query->clone()->where('activity_type', 'internal')->count();
-
-        $chartData = [(int)$practical, (int)$theoretical, (int)$production, (int)$training, (int)$internal];
+        $chartData = [
+            (int) $query->clone()->where('activity_type', 'practical')->count(),
+            (int) $query->clone()->where('activity_type', 'theoretical')->count(),
+            (int) $query->clone()->where('activity_type', 'production')->count(),
+            (int) $query->clone()->where('activity_type', 'training')->count(),
+            (int) $query->clone()->where('activity_type', 'internal')->count(),
+        ];
 
         return view('dashboard.index', [
             'jobdesks' => $jobdesks,
