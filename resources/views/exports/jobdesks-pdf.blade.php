@@ -42,6 +42,7 @@
             <tr>
                 <th class="no">No</th>
                 <th class="date">Date</th>
+                <th class="time">Time</th>
                 <th class="instructor">Instructor</th>
                 <th class="type">Activity Type</th>
                 <th class="activity">Activity Details</th>
@@ -56,6 +57,12 @@
                 <tr>
                     <td class="no">{{ $index + 1 }}</td>
                     <td class="date">{{ $j->activity_date }}</td>
+                    <td class="time">
+                        {{ \Carbon\Carbon::parse($j->start_time)->format('H:i') }}
+                        @if($j->end_time)
+                            - {{ \Carbon\Carbon::parse($j->end_time)->format('H:i') }}
+                        @endif
+                    </td>
                     <td class="instructor">{{ $j->instructor->name }}</td>
                     <td class="type">{{ ucfirst($j->activity_type) }}</td>
                     <td class="activity">

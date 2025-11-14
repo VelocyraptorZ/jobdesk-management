@@ -31,6 +31,7 @@ class JobdeskExport implements FromCollection, WithHeadings, WithMapping, WithTi
         return [
             'No',
             'Date',
+            'Time',
             'Instructor',
             'Activity Type',
             'Activity Details',
@@ -56,9 +57,20 @@ class JobdeskExport implements FromCollection, WithHeadings, WithMapping, WithTi
             $activity = ucfirst($jobdesk->activity_type);
         }
 
+        // Time range
+        $time = $jobdesk->start_time 
+            ? \Carbon\Carbon::parse($jobdesk->start_time)->format('H:i') 
+            : '';
+        if ($jobdesk->end_time) {
+            $time .= '–' . \Carbon\Carbon::parse($jobdesk->end_time)->format('H:i');
+        } elseif ($jobdesk->start_time) {
+            $time .= '–';
+        }
+
         return [
             '', // No (filled in styles)
             $jobdesk->activity_date,
+            $time,
             $jobdesk->instructor->name,
             ucfirst($jobdesk->activity_type),
             $activity,
@@ -77,7 +89,7 @@ class JobdeskExport implements FromCollection, WithHeadings, WithMapping, WithTi
     public function styles(Worksheet $sheet)
     {
         // Header style
-        $sheet->getStyle('A1:I1')->applyFromArray([
+        $sheet->getStyle('A1:J1')->applyFromArray([
             'font' => ['bold' => true, 'color' => ['rgb' => 'FFFFFF']],
             'fill' => ['fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID, 'startColor' => ['rgb' => '2563EB']],
         ]);
@@ -89,7 +101,7 @@ class JobdeskExport implements FromCollection, WithHeadings, WithMapping, WithTi
         }
 
         // Auto-fit columns
-        foreach (range('A', 'I') as $col) {
+        foreach (range('A', 'J') as $col) {
             $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 
