@@ -99,7 +99,7 @@
                             <tbody class="bg-white divide-y divide-gray-200">
                                 @foreach($jobdesks as $j)
                                 <tr>
-                                    <td class="px-4 py-3 whitespace-nowrap">{{ $j->activity_date }}</td>
+                                    <td class="px-4 py-3 whitespace-nowrap">{{ $j->activity_date->format('d M Y') }}</td>
                                     <td class="px-4 py-3 whitespace-nowrap">{{ $j->instructor->name }}</td>
                                     <td class="px-4 py-3 whitespace-nowrap">{{ ucfirst($j->activity_type) }}</td>
                                     <td class="px-4 py-3">

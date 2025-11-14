@@ -24,6 +24,12 @@ class Jobdesk extends Model
         'updated_by' // ← added
     ];
 
+    protected $casts = [
+        'activity_date' => 'date:Y-m-d',
+        'start_time' => 'datetime:H:i',
+        'end_time' => 'datetime:H:i',
+    ];
+
     public function instructor()
     {
         return $this->belongsTo(Instructor::class);

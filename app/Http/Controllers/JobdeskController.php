@@ -61,55 +61,82 @@ class JobdeskController extends Controller
         // Base validation
         $request->validate([
             'instructor_id' => 'required|exists:instructors,id',
-            'activity_date' => 'required|date',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after_or_equal:start_date',
             'start_time' => 'required',
-            'activity_type' => ['required', Rule::in(['practical', 'theoretical', 'production', 'training', 'internal'])],
+            'end_time' => 'nullable|after:start_time',
+            'activity_type' => ['required', 'in:practical,theoretical,production,training,internal'],
             'description' => 'required|string',
         ]);
 
-        // Conditional validations
+        // Conditional validation (100% Laravel 10 compatible)
+        $conditionalRules = [];
+
         if (in_array($request->activity_type, ['practical', 'theoretical'])) {
-            $request->validate(['course_id' => 'nullable|exists:courses,id']);
+            $conditionalRules['course_id'] = 'required|exists:courses,id';
+        } else {
+            $conditionalRules['course_id'] = 'nullable';
         }
 
         if ($request->activity_type === 'production') {
-            $request->validate(['production_id' => 'nullable|exists:productions,id']);
+            $conditionalRules['production_id'] = 'required|exists:productions,id';
+        } else {
+            $conditionalRules['production_id'] = 'nullable';
         }
 
         if ($request->activity_type === 'training') {
-            $request->validate(['training_id' => 'nullable|exists:trainings,id']);
+            $conditionalRules['training_id'] = 'required|exists:trainings,id';
+        } else {
+            $conditionalRules['training_id'] = 'nullable';
         }
 
         if ($request->activity_type === 'internal') {
-            $request->validate(['internal_activity_id' => 'required|exists:internal_activities,id']);
+            $conditionalRules['internal_activity_id'] = 'required|exists:internal_activities,id';
+        } else {
+            $conditionalRules['internal_activity_id'] = 'nullable';
         }
 
-        $data = $request->only([
-            'instructor_id', 'activity_date', 'start_time', 'activity_type', 'description'
-        ]);
+        $request->validate($conditionalRules);
 
-        // Clear all references first
-        $data['course_id'] = null;
-        $data['production_id'] = null;
-        $data['training_id'] = null;
-        $data['internal_activity_id'] = null; 
+        // Prepare base data
+        $baseData = [
+            'instructor_id' => $request->instructor_id,
+            'start_time' => $request->start_time,
+            'end_time' => $request->end_time,
+            'activity_type' => $request->activity_type,
+            'description' => $request->description,
+            'course_id' => null,
+            'production_id' => null,
+            'training_id' => null,
+            'internal_activity_id' => null,
+            'status' => 'pending',
+        ];
 
-        // Set the correct one
+        // Set activity reference
         if (in_array($request->activity_type, ['practical', 'theoretical'])) {
-            $data['course_id'] = $request->course_id;
+            $baseData['course_id'] = $request->course_id;
         } elseif ($request->activity_type === 'production') {
-            $data['production_id'] = $request->production_id;
+            $baseData['production_id'] = $request->production_id;
         } elseif ($request->activity_type === 'training') {
-            $data['training_id'] = $request->training_id;
+            $baseData['training_id'] = $request->training_id;
         } elseif ($request->activity_type === 'internal') {
-            $data['internal_activity_id'] = $request->internal_activity_id;
+            $baseData['internal_activity_id'] = $request->internal_activity_id;
         }
 
-        $data['status'] = 'pending';
+        // Generate entries for date range
+        $startDate = \Carbon\Carbon::parse($request->start_date);
+        $endDate = \Carbon\Carbon::parse($request->end_date);
 
-        Jobdesk::create($data);
+        $createdCount = 0;
+        for ($date = $startDate; $date->lte($endDate); $date->addDay()) {
+            Jobdesk::create(array_merge($baseData, [
+                'activity_date' => $date->format('Y-m-d'),
+            ]));
+            $createdCount++;
+        }
 
-        return redirect()->route('jobdesks.entries.index')->with('success', 'Jobdesk entry submitted for approval.');
+        return redirect()->route('jobdesks.entries.index')
+            ->with('success', "Jobdesk entries created for {$createdCount} days.");
     }
 
     /**
@@ -145,38 +172,56 @@ class JobdeskController extends Controller
             'instructor_id' => 'required|exists:instructors,id',
             'activity_date' => 'required|date',
             'start_time' => 'required',
-            'activity_type' => ['required', Rule::in(['practical', 'theoretical', 'production', 'training', 'internal'])],
+            'end_time' => 'nullable|after:start_time',
+            'activity_type' => ['required', 'in:practical,theoretical,production,training,internal'],
             'description' => 'required|string',
         ]);
 
-        // Conditional validations
+        // Conditional validation
+        $rules = [];
         if (in_array($request->activity_type, ['practical', 'theoretical'])) {
-            $request->validate(['course_id' => 'nullable|exists:courses,id']);
+            $rules['course_id'] = 'required|exists:courses,id';
+        } else {
+            $rules['course_id'] = 'nullable';
         }
 
         if ($request->activity_type === 'production') {
-            $request->validate(['production_id' => 'nullable|exists:productions,id']);
+            $rules['production_id'] = 'required|exists:productions,id';
+        } else {
+            $rules['production_id'] = 'nullable';
         }
 
         if ($request->activity_type === 'training') {
-            $request->validate(['training_id' => 'nullable|exists:trainings,id']);
+            $rules['training_id'] = 'required|exists:trainings,id';
+        } else {
+            $rules['training_id'] = 'nullable';
         }
 
         if ($request->activity_type === 'internal') {
-            $request->validate(['internal_activity_id' => 'required|exists:internal_activities,id']);
+            $rules['internal_activity_id'] = 'required|exists:internal_activities,id';
+        } else {
+            $rules['internal_activity_id'] = 'nullable';
         }
 
-        $data = $request->only([
-            'instructor_id', 'activity_date', 'start_time', 'activity_type', 'description'
-        ]);
+        $request->validate($rules);
 
-        // Clear all reference fields
-        $data['course_id'] = null;
-        $data['production_id'] = null;
-        $data['training_id'] = null;
-        $data['internal_activity_id'] = null; 
+        // Prepare data
+        $data = [
+            'instructor_id' => $request->instructor_id,
+            'activity_date' => $request->activity_date,
+            'start_time' => $request->start_time,
+            'end_time' => $request->end_time,
+            'activity_type' => $request->activity_type,
+            'description' => $request->description,
+            'course_id' => null,
+            'production_id' => null,
+            'training_id' => null,
+            'internal_activity_id' => null,
+            // ✅ Preserve current status (do NOT reset to 'pending')
+            'status' => $entry->status,
+        ];
 
-        // Set the correct reference
+        // Set correct reference
         if (in_array($request->activity_type, ['practical', 'theoretical'])) {
             $data['course_id'] = $request->course_id;
         } elseif ($request->activity_type === 'production') {
@@ -189,7 +234,8 @@ class JobdeskController extends Controller
 
         $entry->update($data);
 
-        return redirect()->route('jobdesks.entries.index')->with('success', 'Jobdesk entry updated successfully.');
+        return redirect()->route('jobdesks.entries.index')
+            ->with('success', 'Jobdesk entry updated successfully.');
     }
 
     /**
