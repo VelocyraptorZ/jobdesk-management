@@ -82,28 +82,42 @@
                     @else
                         <div class="overflow-x-auto">
                             <table class="min-w-full divide-y divide-gray-200">
+                                <!-- Table Header -->
                                 <thead class="bg-gray-50">
                                     <tr>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Instructor</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Activity</th>
-                                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th> {{-- 👈 NEW --}}
+                                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Instructor</th>
+                                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Activity Type</th>
+                                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Activity</th>
+                                        <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
                                     </tr>
                                 </thead>
+
+                                <!-- Table Body -->
                                 <tbody class="bg-white divide-y divide-gray-200">
                                     @foreach($jobdesks as $jobdesk)
                                         <tr>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                            <td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
                                                 {{ \Carbon\Carbon::parse($jobdesk->activity_date)->format('d M Y') }}
                                             </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            {{-- 👇 NEW: Time Range --}}
+                                            <td class="px-4 py-3 text-sm">
+                                                {{-- <div>{{ \Carbon\Carbon::parse($jobdesk->activity_date)->format('d M Y') }}</div> --}}
+                                                <div class="text-gray-500 font-mono text-xs">
+                                                    @if($jobdesk->start_time)
+                                                        {{ \Carbon\Carbon::parse($jobdesk->start_time)->format('H:i') }} –
+                                                        {{ $jobdesk->end_time ? \Carbon\Carbon::parse($jobdesk->end_time)->format('H:i') : '' }}
+                                                    @endif
+                                                </div>
+                                            </td>
+                                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
                                                 {{ $jobdesk->instructor->name }}
                                             </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
                                                 {{ ucfirst($jobdesk->activity_type) }}
                                             </td>
-                                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
                                                 @if($jobdesk->course)
                                                     {{ $jobdesk->course->name }} ({{ ucfirst($jobdesk->course->type) }})
                                                 @elseif($jobdesk->production)
@@ -111,13 +125,13 @@
                                                 @elseif($jobdesk->training)
                                                     📚 {{ $jobdesk->training->name }}
                                                 @elseif($jobdesk->internalActivity)
-                                                    ⚙️ {{ $jobdesk->internalActivity->name }}
+                                                    🏢 {{ $jobdesk->internalActivity->name }}
                                                 @else
                                                     <em>N/A</em>
                                                 @endif
                                             </td>
-                                            <td class="px-6 py-4 text-sm text-gray-500">
-                                                {{ Str::limit($jobdesk->description, 60) }}
+                                            <td class="px-4 py-3 text-sm text-gray-500">
+                                                {{ Str::limit($jobdesk->description, 50) }}
                                             </td>
                                         </tr>
                                     @endforeach
