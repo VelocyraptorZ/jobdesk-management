@@ -9,10 +9,17 @@ class ApprovalController extends Controller
 {
     public function index()
     {
-        $pendingEntries = Jobdesk::with('instructor', 'course', 'production', 'training')
-            ->pending()
-            ->latest('activity_date')
-            ->paginate(15);
+        $pendingEntries = Jobdesk::with([
+            'instructor',
+            'course',
+            'production',
+            'training',
+            'internalActivity', 
+            'updater' 
+        ])
+        ->pending()
+        ->latest('activity_date')
+        ->paginate(15);
 
         return view('master.approvals.index', compact('pendingEntries'));
     }
